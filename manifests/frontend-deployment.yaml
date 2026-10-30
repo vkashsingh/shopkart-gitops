@@ -24,7 +24,7 @@ spec:
         runAsUser: 101
       containers:
         - name: shop-frontend
-          image: vkashs/shopkart-frontend:c2c3376
+          image: vkashs/shopkart-frontend:c5c8754
           ports:
             - name: http
               containerPort: 8080
