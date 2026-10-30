@@ -1,0 +1,36 @@
+# PrometheusRule: 3 alerts for ShopKart. Picked up by Prometheus automatically
+# (ruleSelectorNilUsesHelmValues: false in platform/monitoring/values.yaml).
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: shopkart-alerts
+  namespace: shopkart
+  labels:
+    app.kubernetes.io/part-of: shopkart
+spec:
+  groups:
+    - name: shopkart.rules
+      rules:
+        - alert: BackendHighErrorRate
+          # More than 5% of backend requests return 5xx, for 5 minutes
+          expr: |
+            sum(rate(http_requests_total{namespace="shopkart",status=~"5.."}[5m]))
+              / sum(rate(http_requests_total{namespace="shopkart"}[5m])) > 0.05
+          for: 5m
+          labels: { severity: critical }
+          annotations:
+            summary: "Backend 5xx error rate above 5%"
+        - alert: PodRestartingOften
+          # A container in shopkart restarted more than 3 times in 10 minutes
+          expr: increase(kube_pod_container_status_restarts_total{namespace="shopkart"}[10m]) > 3
+          for: 1m
+          labels: { severity: warning }
+          annotations:
+            summary: "{{ $labels.pod }} restarted more than 3 times in 10 minutes"
+        - alert: NodeMemoryHigh
+          # A node has used more than 85% of its memory for 10 minutes
+          expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 0.85
+          for: 10m
+          labels: { severity: warning }
+          annotations:
+            summary: "Node {{ $labels.instance }} memory above 85%"
