@@ -1,0 +1,25 @@
+# Argo CD Application configuring continuous delivery for the ShopKart application stack on EKS.
+# Tracks the manifests/ directory in this GitOps repository and reconciles state into the shopkart namespace.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shopkart
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: shopkart
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/vkashsingh/shopkart-gitops.git
+    targetRevision: main
+    path: manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: shopkart
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+

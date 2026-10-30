@@ -1,0 +1,16 @@
+# PodDisruptionBudget ensuring high availability of shop-backend during node maintenance and drains.
+# Guarantees at least 1 backend replica remains online when pods are voluntarily evicted.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: shop-backend
+  namespace: shopkart
+  labels:
+    app: shop-backend
+    app.kubernetes.io/part-of: shopkart
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: shop-backend
+

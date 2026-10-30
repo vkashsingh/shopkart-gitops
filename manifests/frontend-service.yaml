@@ -1,0 +1,20 @@
+# LoadBalancer Service provisioning an external cloud load balancer for public user traffic.
+# Forwards incoming port 80 HTTP requests directly to shop-frontend pods on targetPort 8080.
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-frontend
+  namespace: shopkart
+  labels:
+    app: shop-frontend
+    app.kubernetes.io/part-of: shopkart
+spec:
+  type: LoadBalancer
+  selector:
+    app: shop-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+

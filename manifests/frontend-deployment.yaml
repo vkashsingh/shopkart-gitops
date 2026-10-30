@@ -1,0 +1,57 @@
+# Deployment running unprivileged Nginx web servers hosting the ShopKart frontend SPA.
+# Reverse-proxies API calls to backend-service and receives external traffic from frontend-service.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-frontend
+  namespace: shopkart
+  labels:
+    app: shop-frontend
+    app.kubernetes.io/part-of: shopkart
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: shop-frontend
+  template:
+    metadata:
+      labels:
+        app: shop-frontend
+        app.kubernetes.io/part-of: shopkart
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+      containers:
+        - name: shop-frontend
+          image: vkashs/shopkart-frontend:9f11b24
+          ports:
+            - name: http
+              containerPort: 8080
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 101
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /nginx-health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /nginx-health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+

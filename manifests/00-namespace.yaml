@@ -1,0 +1,10 @@
+# Declares the dedicated Kubernetes namespace for the ShopKart application.
+# Scopes all namespaced resources (backend, frontend, database) managed by Argo CD.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shopkart
+  labels:
+    name: shopkart
+    app.kubernetes.io/part-of: shopkart
+
