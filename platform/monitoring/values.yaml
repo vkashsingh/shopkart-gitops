@@ -1,0 +1,51 @@
+# kube-prometheus-stack values for the ShopKart lab (2 x m7i-flex.large).
+# Chart: prometheus-community/kube-prometheus-stack 92.16.1, release "monitoring", namespace "monitoring"
+# Installed with Helm (third-party software); the app itself stays plain YAML.
+
+grafana:
+  admin:                         # password comes from a Secret, never from this file
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password
+  persistence:
+    enabled: false               # lab: dashboards are re-imported if Grafana restarts
+  resources:
+    requests: { cpu: 50m, memory: 256Mi }
+    limits: { memory: 512Mi }
+
+prometheus:
+  prometheusSpec:
+    retention: 3d
+    resources:
+      requests: { cpu: 200m, memory: 512Mi }
+      limits: { memory: 1Gi }
+    # Pick up every ServiceMonitor / PrometheusRule, not only ones labelled for this Helm release
+    serviceMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests: { cpu: 20m, memory: 64Mi }
+      limits: { memory: 128Mi }
+
+prometheusOperator:
+  resources:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { memory: 256Mi }
+
+kube-state-metrics:
+  resources:
+    requests: { cpu: 20m, memory: 64Mi }
+    limits: { memory: 128Mi }
+
+prometheus-node-exporter:
+  resources:
+    requests: { cpu: 20m, memory: 32Mi }
+    limits: { memory: 64Mi }
+
+# EKS manages the control plane, so these can't be scraped; disabling them avoids permanent "DOWN" targets.
+kubeEtcd: { enabled: false }
+kubeControllerManager: { enabled: false }
+kubeScheduler: { enabled: false }
+kubeProxy: { enabled: false }
