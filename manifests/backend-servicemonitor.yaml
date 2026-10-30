@@ -1,0 +1,17 @@
+# ServiceMonitor: tells Prometheus to scrape the shop-backend Service's /metrics every 30s.
+# Matches the Service by label app=shop-backend and port name "http" (see backend-service.yaml).
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: shop-backend
+  namespace: shopkart
+  labels:
+    app.kubernetes.io/part-of: shopkart
+spec:
+  selector:
+    matchLabels:
+      app: shop-backend
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
