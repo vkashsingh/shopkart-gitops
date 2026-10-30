@@ -57,10 +57,25 @@ Incoming user traffic routes through the shop-frontend LoadBalancer to the front
 
 ---
 
+## Monitoring
+
+Prometheus, Grafana and Alertmanager are installed with the Helm chart kube-prometheus-stack (version 92.16.1) into namespace monitoring; its settings are in platform/monitoring/values.yaml (used by Helm, ignored by Argo CD).
+
+| File | What It Does |
+| :--- | :--- |
+| `manifests/backend-servicemonitor.yaml` | Prometheus scrapes the shop-backend Service, port http, /metrics, every 30s |
+| `manifests/alerts-prometheusrule.yaml` | 3 alerts: backend 5xx above 5%, pod restarting more than 3 times in 10 minutes, node memory above 85% |
+| `platform/monitoring/values.yaml` | Helm values for the monitoring stack |
+
+The ServiceMonitor and PrometheusRule are applied by Argo CD like the app; Grafana and Prometheus are opened with kubectl port-forward, never exposed publicly.
+
+---
+
 ## What's Inside
 
 - `manifests/`: Plain Kubernetes manifests for the `shopkart` namespace, frontend and backend Deployments and Services, disruption budget, and MongoDB StatefulSet.
 - `apps/shopkart-app.yaml`: Argo CD Application resource configured with automated sync, prune, self-healing, and namespace creation.
+- `platform/`: Helm values and configuration for platform tooling, including kube-prometheus-stack.
 
 ---
 
