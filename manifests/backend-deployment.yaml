@@ -24,7 +24,7 @@ spec:
         runAsUser: 1000
       containers:
         - name: shop-backend
-          image: vkashs/shopkart-backend:4c5123d
+          image: vkashs/shopkart-backend:a4260ae
           ports:
             - name: http
               containerPort: 8080
